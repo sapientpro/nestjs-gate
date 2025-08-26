@@ -58,7 +58,6 @@ export class GateService implements OnApplicationBootstrap {
         }
         this.policies.set(<Type>meta, wrapper.instance as PolicyMap);
       });
-    console.log(this.policies);
   }
 
   /**
