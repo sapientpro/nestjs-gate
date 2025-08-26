@@ -1,4 +1,9 @@
-import { ForwardReference, Inject, OnApplicationBootstrap, Type } from '@nestjs/common';
+import {
+  ForwardReference,
+  Inject,
+  OnApplicationBootstrap,
+  Type,
+} from '@nestjs/common';
 import { DiscoveryService } from '@nestjs/core';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { Policy } from './decorators';
@@ -7,13 +12,20 @@ import { GateResponse } from './gate.response';
 type Result = boolean | null | GateResponse | undefined;
 type PolicyResult = Promise<Result> | Result;
 
-type PolicyMap = Record<string, (user: unknown, ...args: any[]) => PolicyResult> & {
+type PolicyMap = Record<
+  string,
+  (user: unknown, ...args: any[]) => PolicyResult
+> & {
   before?: (user: unknown, ability: string, ...args: any[]) => PolicyResult;
 };
 
 type AbilityCallback<U = any> = (user: U, ...args: any[]) => PolicyResult;
 
-type BeforeCallback<U = any> = (user: U, ability: string, args: any[]) => PolicyResult;
+type BeforeCallback<U = any> = (
+  user: U,
+  ability: string,
+  args: any[],
+) => PolicyResult;
 
 type AfterCallback<U = any> = (
   user: U,
@@ -33,14 +45,19 @@ export class GateService implements OnApplicationBootstrap {
   private readonly rls = new AsyncLocalStorage<unknown>();
 
   onApplicationBootstrap() {
-    this.discoveryService.getProviders({ metadataKey: Policy.KEY }).forEach((wrapper) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      let meta: Type | ForwardReference<() => Type> = Reflect.getMetadata(Policy.KEY, wrapper.metatype as Type);
-      if (Object.hasOwn(meta, 'forwardRef')) {
-        meta = (<ForwardReference<() => Type>>meta).forwardRef();
-      }
-      this.policies.set(<Type>meta, wrapper.instance as PolicyMap);
-    });
+    this.discoveryService
+      .getProviders({ metadataKey: Policy.KEY })
+      .forEach((wrapper) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        let meta: Type | ForwardReference<() => Type> = Reflect.getMetadata(
+          Policy.KEY,
+          wrapper.metatype as Type,
+        );
+        if (Object.hasOwn(meta, 'forwardRef')) {
+          meta = (<ForwardReference<() => Type>>meta).forwardRef();
+        }
+        this.policies.set(<Type>meta, wrapper.instance as PolicyMap);
+      });
     console.log(this.policies);
   }
 
@@ -157,7 +174,8 @@ export class GateService implements OnApplicationBootstrap {
     // back a non-null response, we will immediately return that result in order
     // to let the developers override all checks for some authorization cases.
     let result =
-      (await this.callBeforeCallbacks(user, ability, args)) ?? (await this.callAuthCallback(user, ability, args));
+      (await this.callBeforeCallbacks(user, ability, args)) ??
+      (await this.callAuthCallback(user, ability, args));
 
     // After calling the authorization callback, we will call the "after" callbacks
     // that are registered with the Gate, which allows a developer to do logging
@@ -170,13 +188,18 @@ export class GateService implements OnApplicationBootstrap {
   /**
    * Call all of the before callbacks and return if a result is given.
    */
-  protected async callBeforeCallbacks(user: any, ability: string, args: unknown[]) {
+  protected async callBeforeCallbacks(
+    user: any,
+    ability: string,
+    args: unknown[],
+  ) {
     for (const before of this.beforeCallbacks) {
       const result = await before(user, ability, args);
       if (result !== null && result !== undefined) {
         return result;
       }
     }
+    return null;
   }
 
   /**
@@ -207,8 +230,12 @@ export class GateService implements OnApplicationBootstrap {
   /**
    * Resolve the callable for the given ability and arguments.
    */
-  protected resolveAuthCallback(user: any, ability: string, args: unknown[]): AbilityCallback {
-    let policy: PolicyMap | undefined, callback: AbilityCallback | false;
+  protected resolveAuthCallback(
+    user: any,
+    ability: string,
+    args: unknown[],
+  ): AbilityCallback {
+    let policy: PolicyMap | false, callback: AbilityCallback | false;
     if (
       args[0] &&
       (policy = this.getPolicyFor(args[0])) &&
@@ -244,12 +271,19 @@ export class GateService implements OnApplicationBootstrap {
         return policy;
       }
     }
+
+    return false;
   }
 
   /**
    * Resolve the callback for a policy check.
    */
-  protected resolvePolicyCallback(user: any, ability: string, args: any[], policy: PolicyMap) {
+  protected resolvePolicyCallback(
+    user: any,
+    ability: string,
+    args: any[],
+    policy: PolicyMap,
+  ) {
     const method = this.formatAbilityToMethod(ability);
     if (typeof policy[method] !== 'function') {
       return false;
@@ -272,7 +306,12 @@ export class GateService implements OnApplicationBootstrap {
   /**
    * Call the "before" method on the given policy, if applicable.
    */
-  protected callPolicyBefore(policy: PolicyMap, user: any, ability: string, args: unknown[]) {
+  protected callPolicyBefore(
+    policy: PolicyMap,
+    user: any,
+    ability: string,
+    args: unknown[],
+  ) {
     if (typeof policy['before'] !== 'function') {
       return;
     }
@@ -283,7 +322,12 @@ export class GateService implements OnApplicationBootstrap {
   /**
    * Call the appropriate method on the given policy.
    */
-  protected async callPolicyMethod(policy: PolicyMap, method: string, user: any, args: unknown[]) {
+  protected async callPolicyMethod(
+    policy: PolicyMap,
+    method: string,
+    user: any,
+    args: unknown[],
+  ) {
     // If this first argument is a string, that means they are passing a class name
     // to the policy. We will remove the first argument from this argument array
     // because this policy already knows what type of models it can authorize.
@@ -302,7 +346,9 @@ export class GateService implements OnApplicationBootstrap {
       return ability
         .toLowerCase()
         .split(/[-_\s]+/)
-        .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+        .map((word, index) =>
+          index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1),
+        )
         .join('');
     return ability;
   }
@@ -311,7 +357,11 @@ export class GateService implements OnApplicationBootstrap {
     return this.rls.getStore();
   }
 
-  public runWithUser<R, TArgs extends any[]>(user: unknown, callback: (...args: TArgs) => R, ...args: TArgs): R {
+  public runWithUser<R, TArgs extends any[]>(
+    user: unknown,
+    callback: (...args: TArgs) => R,
+    ...args: TArgs
+  ): R {
     return this.rls.run(user, callback, ...args);
   }
 }
