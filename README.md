@@ -1,4 +1,5 @@
 # @sapientpro/nestjs-gate
+[![NPM Package](https://img.shields.io/npm/v/@sapientpro/typeorm-eager-load.svg)](https://www.npmjs.org/package/@sapientpro/nestjs-gate)
 
 Lightweight authorization gate for NestJS with:
 - Ability callbacks (define/has/allows/denies/any/none/authorize)
