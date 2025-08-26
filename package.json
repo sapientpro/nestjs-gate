@@ -1,0 +1,59 @@
+{
+  "name": "@sapientpro/nestjs-gate",
+  "version": "1.0.0",
+  "description": "Lightweight authorization gate for NestJS with policy classes, ability callbacks, and before/after hooks.",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "author": {
+    "name": "Dmytro Kulyk",
+    "email": "dmytro.kulyk@sapient.pro"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sapientpro/nestjs-gate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sapientpro/nestjs-gate/issues"
+  },
+  "homepage": "https://github.com/sapientpro/nestjs-gate",
+  "keywords": [
+    "nestjs",
+    "authorization",
+    "gate",
+    "policy"
+  ],
+  "engines": {
+    "node": ">= 20.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": {
+        "require": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prepare": "npm run compile",
+    "compile": "rimraf ./dist && tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "tslib": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.13.0",
+    "rimraf": "^4.4.1",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "@nestjs/common": ">=10.0.0",
+    "@nestjs/core": ">=10.0.0"
+  },
+  "files": [
+    "dist"
+  ]
+}
