@@ -165,6 +165,31 @@ const result = gate.runWithUser(currentUser, () => gate.allows('create-post', [d
 
 You can still pass the user explicitly by designing your ability callbacks to accept the user as the first parameter; GateService calls your ability with (user, ...args) automatically.
 
+Middleware example:
+
+```ts
+// auth.middleware.ts
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { GateService } from '@sapientpro/nestjs-gate';
+
+@Injectable()
+export class AuthMiddleware implements NestMiddleware {
+  constructor(private readonly gateService: GateService) {}
+
+  use(req: Request, _res: Response, next: (err?: any) => void) {
+    // Resolve user from the request in your own way
+    // e.g., from a session, a JWT, or a header
+    const user = (req as any).user; // replace with your real extraction logic
+
+    // Ensure every downstream authorization call runs with this user
+    this.gateService.runWithUser(user, next);
+  }
+}
+```
+
+This way, any providers/controllers executed after the middleware can call gate methods (allows/authorize/etc.) without needing to pass the user explicitly.
+
 ## API Summary
 
 - GateModule: Nest module that provides GateService. Imports DiscoveryModule internally to discover policies.
