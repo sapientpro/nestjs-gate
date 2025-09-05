@@ -1,6 +1,6 @@
 {
   "name": "@sapientpro/nestjs-gate",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Lightweight authorization gate for NestJS with policy classes, ability callbacks, and before/after hooks.",
   "license": "MIT",
   "readmeFilename": "README.md",
@@ -41,9 +41,6 @@
     "compile": "rimraf ./dist && tsc",
     "watch": "tsc -w"
   },
-  "dependencies": {
-    "tslib": "^2.5.0"
-  },
   "devDependencies": {
     "@types/node": "^20.13.0",
     "rimraf": "^4.4.1",
@@ -51,7 +48,8 @@
   },
   "peerDependencies": {
     "@nestjs/common": ">=10.0.0",
-    "@nestjs/core": ">=10.0.0"
+    "@nestjs/core": ">=10.0.0",
+    "tslib": "^2.5.0"
   },
   "files": [
     "dist"

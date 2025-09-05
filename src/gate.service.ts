@@ -38,11 +38,11 @@ export class GateService implements OnApplicationBootstrap {
   @Inject()
   private readonly discoveryService!: DiscoveryService;
 
-  private policies = new Map<Type, PolicyMap>();
-  private abilities = new Map<string, AbilityCallback>();
-  private beforeCallbacks = new Array<BeforeCallback<any>>();
-  private afterCallbacks = new Array<AfterCallback>();
-  private readonly rls = new AsyncLocalStorage<unknown>();
+  private readonly policies = new Map<Type, PolicyMap>();
+  private readonly abilities = new Map<string, AbilityCallback>();
+  private readonly beforeCallbacks = new Array<BeforeCallback>();
+  private readonly afterCallbacks = new Array<AfterCallback>();
+  private readonly context = new AsyncLocalStorage<unknown>();
 
   onApplicationBootstrap() {
     this.discoveryService
@@ -353,14 +353,24 @@ export class GateService implements OnApplicationBootstrap {
   }
 
   protected resolveUser(): unknown {
-    return this.rls.getStore();
+    return this.context.getStore();
   }
 
+  /**
+   * Run the given callback with the given user.
+   */
   public runWithUser<R, TArgs extends any[]>(
     user: unknown,
     callback: (...args: TArgs) => R,
     ...args: TArgs
   ): R {
-    return this.rls.run(user, callback, ...args);
+    return this.context.run(user, callback, ...args);
+  }
+
+  /**
+   * Create a new GateResponse.
+   */
+  public response(allowed: boolean, message: string | null = null, code: any = null) {
+    return new GateResponse(allowed, message, code)
   }
 }
