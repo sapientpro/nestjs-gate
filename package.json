@@ -1,6 +1,6 @@
 {
   "name": "@sapientpro/nestjs-gate",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Lightweight authorization gate for NestJS with policy classes, ability callbacks, and before/after hooks.",
   "license": "MIT",
   "readmeFilename": "README.md",

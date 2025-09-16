@@ -330,11 +330,7 @@ export class GateService implements OnApplicationBootstrap {
     // If this first argument is a string, that means they are passing a class name
     // to the policy. We will remove the first argument from this argument array
     // because this policy already knows what type of models it can authorize.
-    if (typeof args[0] === 'function') {
-      args.shift();
-    }
-
-    return policy[method](user, ...args);
+    return policy[method](user, ...(typeof args[0] === 'function' ? args.slice(1) : args));
   }
 
   /**
