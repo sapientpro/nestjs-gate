@@ -30,7 +30,7 @@ type BeforeCallback<U = any> = (
 type AfterCallback<U = any> = (
   user: U,
   ability: string,
-  result: boolean | null | undefined,
+  result: Result,
   args: any[],
 ) => PolicyResult;
 
@@ -208,7 +208,7 @@ export class GateService implements OnApplicationBootstrap {
     user: any,
     ability: string,
     args: unknown[],
-    result: boolean | GateResponse | null | undefined,
+    result: Result,
   ) {
     for (const after of this.afterCallbacks) {
       result ??= await after(user, ability, result, args);
